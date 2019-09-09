@@ -12,7 +12,7 @@ mongoose.connect(db, { useNewUrlParser: true });
 
 device.on('connect', () => {
   console.log('Connect successfully!');
-  console.log('Post properties every hour...');
+  console.log('Post properties every half an hour...');
   setInterval(() => {
     getTempInfo(2, (err, temp, hum) => {
       const params = {
@@ -31,7 +31,7 @@ device.on('connect', () => {
       console.log(`Post properties: ${JSON.stringify(params)}`);
       device.postProps(params);
     });
-  }, 3600000);
+  }, 1800000);
 
   device.serve('property/set', (data) => {
     console.log('Received a message: ', JSON.stringify(data));
