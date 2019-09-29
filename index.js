@@ -13,24 +13,9 @@ mongoose.connect(db, { useNewUrlParser: true });
 device.on('connect', () => {
   console.log('Connect successfully!');
   console.log('Post properties every half an hour...');
+  postTemp();
   setInterval(() => {
-    getTempInfo(2, (err, temp, hum) => {
-      const params = {
-        Temperature: temp,
-        Humidity: hum
-      };
-
-      DataModel.create(
-        {
-          Time: Date.now(),
-          Temperature: temp,
-          Humidity: hum
-        }
-      );
-
-      console.log(`Post properties: ${JSON.stringify(params)}`);
-      device.postProps(params);
-    });
+    postTemp();
   }, 1800000);
 
   device.serve('property/set', (data) => {
@@ -41,3 +26,23 @@ device.on('connect', () => {
 device.on('error', err => {
   console.error(err);
 });
+
+function postTemp() {
+  getTempInfo(2, (err, temp, hum) => {
+    const params = {
+      Temperature: temp,
+      Humidity: hum
+    };
+
+    DataModel.create(
+      {
+        Time: Date.now(),
+        Temperature: temp,
+        Humidity: hum
+      }
+    );
+
+    console.log(`Post properties: ${JSON.stringify(params)}`);
+    device.postProps(params);
+  });
+}
