@@ -1,3 +1,3 @@
 # raspi-iot
 
-A little code collects IoT data and delivers to the database.
+Code collects IoT data and delivers to the database.
