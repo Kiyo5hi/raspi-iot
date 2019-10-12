@@ -1,48 +1,74 @@
-const aliyunIot = require('aliyun-iot-device-sdk');
+// import alibabacloud iot sdk
+const iot = require('alibabacloud-iot-device-sdk');
 const deviceConfig = require('./config/device_id_password.json');
+
+// import getTemp() function to get data
 const getTempInfo = require('./sensors/dht.js');
+
+// import mongoose to connect MongoDB
 const mongoose = require('mongoose');
-const DataModel = require('./models/datamodel.js');
+// import configs to connect MongoDB
 const config = require('./config/.config.json');
+const db = `mongodb://${config.username}:${config.password}@${config.host}:${config.port}/${config.database}`;
+const MINUTE = 60000;
+const UPDATE_INTERVAL = config.update_interval * MINUTE;
+const POST_INTERVAL_DB = config.post_interval_db * MINUTE;
+const POST_INTERVAL_IOT = config.post_interval_iot * MINUTE;
 
-const db = config.database;
-const device = aliyunIot.device(deviceConfig);
+// import postData() function to post data to MongoDB
+const post = require('./controller/post.js');
 
-mongoose.connect(db, { useNewUrlParser: true });
+// setup a device with imported config
+const device = iot.device(deviceConfig);
 
+// to prompt the device is connected successfully
 device.on('connect', () => {
-  console.log('Connect successfully!');
-  console.log('Post properties every half an hour...');
-  postTemp();
-  setInterval(() => {
-    postTemp();
-  }, 1800000);
-
-  device.serve('property/set', (data) => {
-    console.log('Received a message: ', JSON.stringify(data));
-  });
+    console.log('Connect to IoT platform successfully!');
 });
 
+// to prompt error
 device.on('error', err => {
-  console.error(err);
+    console.error(err);
 });
 
-function postTemp() {
-  getTempInfo(2, (err, temp, hum) => {
-    const params = {
-      Temperature: temp,
-      Humidity: hum
-    };
+// connect to MongoDB
+mongoose.connect(db, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}, (err) => {
+    if (err) throw err;
+    console.log('Connect to MongoDB successfully!');
+});
 
-    DataModel.create(
-      {
-        Time: Date.now(),
-        Temperature: temp,
-        Humidity: hum
-      }
-    );
-
-    console.log(`Post properties: ${JSON.stringify(params)}`);
-    device.postProps(params);
-  });
+// function that gets new data
+var params = {
+    Temperature: 0.0,
+    Humidity: 0.0
+};
+const setParams = function () {
+    getTempInfo(2, (err, temp, hum) => {
+        if (err) throw err;
+        params = {
+            Temperature: temp,
+            Humidity: hum
+        };
+        console.log(`Update params: ${JSON.stringify(params)}`);
+    });
 }
+
+// update params periodically
+console.log(`Updating data every ${config.update_interval} minute(s).`)
+setParams();
+setInterval(setParams, UPDATE_INTERVAL);
+
+// post to IoT periodically
+console.log(`Posting data to IoT platform every ${config.post_interval_iot} minute(s).`);
+setInterval(() => {
+    post.toIoT(device, params);
+}, POST_INTERVAL_IOT);
+
+// post to DB periodically
+console.log(`Posting data to MongoDB every ${config.post_interval_db} minute(s).`)
+setInterval(() => {
+    post.toDB(params);
+}, POST_INTERVAL_DB);

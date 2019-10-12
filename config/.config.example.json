@@ -1,3 +1,10 @@
 {
-  "database": ""
+  "host": "",
+  "port": "",
+  "database": "",
+  "username": "",
+  "password": "",
+  "update_interval": "",
+  "post_interval_db": "",
+  "post_interval_iot": ""
 }
