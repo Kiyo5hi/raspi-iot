@@ -1,3 +1,3 @@
-# raspi-iot
+# raspiot
 
 Code that collects IoT data and delivers to the database.
