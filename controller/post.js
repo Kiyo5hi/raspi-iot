@@ -2,9 +2,9 @@ const DataModel = require('../models/datamodel.js');
 
 const toDB = function (params) {
     DataModel.create({
-        Time: new Date(),
-        Temperature: params.Temperature,
-        Humidity: params.Humidity
+        time: new Date(),
+        temperature: params.temperature,
+        humidity: params.humidity
     });
 
     console.log(`Post properties to DB: ${JSON.stringify(params)}`);

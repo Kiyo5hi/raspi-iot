@@ -9,7 +9,8 @@ const getTempInfo = require('./sensors/dht.js');
 const mongoose = require('mongoose');
 // import configs to connect MongoDB
 const config = require('./config/.config.json');
-const db = `mongodb://${config.username}:${config.password}@${config.host}:${config.port}/${config.database}`;
+const db = config.mongodb;
+console.log(db);
 const MINUTE = 60000;
 const UPDATE_INTERVAL = config.update_interval * MINUTE;
 const POST_INTERVAL_DB = config.post_interval_db * MINUTE;
@@ -42,15 +43,15 @@ mongoose.connect(db, {
 
 // function that gets new data
 var params = {
-    Temperature: 0.0,
-    Humidity: 0.0
+    temperature: 0.0,
+    humidity: 0.0
 };
 const setParams = function () {
     getTempInfo(2, (err, temp, hum) => {
         if (err) throw err;
         params = {
-            Temperature: temp,
-            Humidity: hum
+            temperature: temp,
+            humidity: hum
         };
         console.log(`Update params: ${JSON.stringify(params)}`);
     });

@@ -1,9 +1,5 @@
 {
-  "host": "",
-  "port": "",
-  "database": "",
-  "username": "",
-  "password": "",
+  "mongodb": "mongodb+srv://<username>:<password>@<host>/<database>?retryWrites=true&w=majority",
   "update_interval": "",
   "post_interval_db": "",
   "post_interval_iot": ""
