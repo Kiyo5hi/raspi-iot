@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "alibabacloud-iot-device-sdk": "^1.2.8",
-    "mongoose": "^5.7.4",
+    "mongoose": "^5.7.5",
     "node-dht-sensor": "^0.4.0",
     "saslprep": "^1.0.3"
   }
